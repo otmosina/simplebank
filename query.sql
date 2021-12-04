@@ -14,6 +14,7 @@ INSERT INTO authors (
 )
 RETURNING *;
 
--- name: DeleteAuthor :exec
-DELETE FROM authors
-WHERE id = $
+--name UpdateAccount :exec
+UPDATE accounts
+SET balance = $2
+WHERE id = $1;
