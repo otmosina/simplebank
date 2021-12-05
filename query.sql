@@ -13,8 +13,3 @@ INSERT INTO authors (
   $1, $2
 )
 RETURNING *;
-
---name UpdateAccount :exec
-UPDATE accounts
-SET balance = $2
-WHERE id = $1;
