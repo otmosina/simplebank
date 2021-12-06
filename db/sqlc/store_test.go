@@ -24,12 +24,12 @@ func TestTransferTx(t *testing.T) {
 		})
 	}
 
-	// transfers, err := store.ListTransfer(context.Background(), ListTransferParams{
-	// 	Limit:  1,
-	// 	Offset: 1,
-	// })
+	transfers, err := store.ListTransfer(context.Background(), ListTransferParams{
+		Limit:  5,
+		Offset: 0,
+	})
 
-	// require.NoError(t, err)
-	// require.Len(t, transfers, 5)
-	require.Len(t, 5, 5)
+	require.NoError(t, err)
+	require.Len(t, transfers, 5)
+
 }
