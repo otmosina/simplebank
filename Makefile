@@ -27,4 +27,7 @@ test:
 # gotest:
 # 	/usr/local/go/bin/go test  -timeout 30s -run ^main_test.go$
 
+psql:
+	docker exec -it postgres12 psql -U root -d simple_bank
+
 .PHONY: postgres createdb dropdb migrateup migratedown

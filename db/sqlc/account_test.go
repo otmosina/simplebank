@@ -53,16 +53,16 @@ func TestGetAccount(t *testing.T) {
 func TestUpdateAccount(t *testing.T) {
 	account1 := CreateRandomAccount(t)
 	arg := UpdateAccountParams{
-		ID:      account1.ID,
-		Balance: util.RandomMoney(),
+		ID:     account1.ID,
+		Amount: util.RandomMoney(),
 	}
-	err := testQueries.UpdateAccount(context.Background(), arg)
+	account2, err := testQueries.UpdateAccount(context.Background(), arg)
 	require.NoError(t, err)
-	account2, err := testQueries.GetAccount(context.Background(), account1.ID)
+	// account2, err := testQueries.GetAccount(context.Background(), account1.ID)
 	require.NoError(t, err)
 
 	require.Equal(t, account2.ID, account1.ID, "they should be eq")
-	require.Equal(t, account2.Balance, arg.Balance, "they should be eq")
+	require.Equal(t, account2.Balance, account1.Balance+arg.Amount, "they should be eq")
 	require.Equal(t, account2.Owner, account1.Owner, "they should be eq")
 	require.Equal(t, account2.Currency, account1.Currency, "they should be eq")
 	require.WithinDuration(t, account1.CreatedAt, account2.CreatedAt, time.Second)
