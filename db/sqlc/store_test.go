@@ -8,6 +8,61 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestTransferDeadlockTx(t *testing.T) {
+	store := NewStore(testDB)
+
+	account1 := CreateRandomAccount(t)
+	account2 := CreateRandomAccount(t)
+
+	n := 10
+
+	ress := make(chan TransferTxResult)
+	errs := make(chan error)
+	for i := 0; i < n; i++ {
+		if i%2 == 0 {
+			go func() {
+				result, err := store.TransferTx(context.Background(), TransferTxParams{
+					FromAccountID: account1.ID,
+					ToAccountID:   account2.ID,
+					Amount:        10,
+				})
+
+				errs <- err
+				ress <- result
+			}()
+		} else {
+			go func() {
+				result, err := store.TransferTx(context.Background(), TransferTxParams{
+					FromAccountID: account2.ID,
+					ToAccountID:   account1.ID,
+					Amount:        10,
+				})
+
+				errs <- err
+				ress <- result
+			}()
+		}
+
+	}
+	for i := 0; i < n; i++ {
+		err := <-errs
+		res := <-ress
+		require.NoError(t, err)
+		require.NotEmpty(t, res)
+	}
+
+	updatedAccount1, err := testQueries.GetAccount(context.Background(), account1.ID)
+	require.NoError(t, err)
+	require.NotEmpty(t, updatedAccount1)
+
+	updatedAccount2, err := testQueries.GetAccount(context.Background(), account2.ID)
+	require.NoError(t, err)
+	require.NotEmpty(t, updatedAccount2)
+
+	require.Equal(t, account1.Balance, updatedAccount1.Balance)
+	require.Equal(t, account2.Balance, updatedAccount2.Balance)
+}
+
 func TestTransferTx(t *testing.T) {
 	store := NewStore(testDB)
 
