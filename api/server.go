@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 	db "github.com/otmosina/simplebank/db/sqlc"
 )
 
@@ -20,8 +19,8 @@ type CreateAccountsRequest struct {
 }
 
 type IndexAccountsRequest struct {
-	Limit  int32 `form:"limit" binding:"required,min=1"`
-	Offset int32 `form:"offset" binding:"min=0"`
+	PageId   int32 `form:"page_id" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=5"`
 }
 
 type GetAccountRequest struct {
@@ -78,14 +77,14 @@ func (server *Server) getAccount(ctx *gin.Context) {
 func (server *Server) indexAccounts(ctx *gin.Context) {
 	var req IndexAccountsRequest
 
-	if err := ctx.ShouldBindWith(&req, binding.Query); err != nil {
+	if err := ctx.ShouldBindQuery(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, ErrorResponse(err))
 		return
 	}
 
 	accounts, err := server.store.ListAccounts(ctx, db.ListAccountsParams{
-		Limit:  req.Limit,
-		Offset: req.Offset,
+		Limit:  req.PageSize,
+		Offset: (req.PageId - 1) * req.PageSize,
 	})
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, ErrorResponse(err))
