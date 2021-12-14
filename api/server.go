@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,10 @@ type IndexAccountsRequest struct {
 	Offset int32 `form:"offset" binding:"min=0"`
 }
 
+type GetAccountRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
 func NewServer(db *db.Store) *Server {
 	server := &Server{store: db}
 	router := gin.Default()
@@ -36,6 +41,7 @@ func NewServer(db *db.Store) *Server {
 	// })
 
 	router.GET("/accounts", server.indexAccounts)
+	router.GET("/accounts/:id", server.getAccount)
 	router.POST("/accounts", server.createAccounts)
 	// TODO add some routes
 
@@ -46,6 +52,27 @@ func NewServer(db *db.Store) *Server {
 
 func (server *Server) Start(address string) error {
 	return server.router.Run(address)
+}
+
+func (server *Server) getAccount(ctx *gin.Context) {
+	var req GetAccountRequest
+
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, ErrorResponse(err))
+		return
+	}
+
+	account, err := server.store.GetAccount(ctx, req.ID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, ErrorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusBadRequest, ErrorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, account)
 }
 
 func (server *Server) indexAccounts(ctx *gin.Context) {
@@ -91,11 +118,3 @@ func (server *Server) createAccounts(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, account)
 }
-
-// func createAccounts(ctx *gin.Context) error {
-// 	response := gin.H{
-// 		"status": "ok",
-// 	}
-// 	ctx.JSON(http.StatusOK, response)
-// 	return nil
-// }
