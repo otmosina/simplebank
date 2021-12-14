@@ -34,4 +34,9 @@ test:
 psql:
 	docker exec -it postgres12 psql -U root -d simple_bank
 
+server:
+	go run main.go
+
+
+
 .PHONY: postgres createdb dropdb migrateup migratedown
