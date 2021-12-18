@@ -27,6 +27,8 @@ type GetAccountRequest struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
+type DeleteAccountRequest GetAccountRequest
+
 func NewServer(db *db.Store) *Server {
 	server := &Server{store: db}
 	router := gin.Default()
@@ -41,6 +43,7 @@ func NewServer(db *db.Store) *Server {
 
 	router.GET("/accounts", server.indexAccounts)
 	router.GET("/accounts/:id", server.getAccount)
+	router.POST("/accounts/:id", server.deleteAccount)
 	router.POST("/accounts", server.createAccounts)
 	// TODO add some routes
 
@@ -51,6 +54,27 @@ func NewServer(db *db.Store) *Server {
 
 func (server *Server) Start(address string) error {
 	return server.router.Run(address)
+}
+
+func (server *Server) deleteAccount(ctx *gin.Context) {
+	var req DeleteAccountRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, ErrorResponse(err))
+		return
+	}
+
+	account, err := server.store.GetAccount(ctx, req.ID)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, ErrorResponse(err))
+		return
+	}
+	err = server.store.DeleteAccount(ctx, account.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, SuccessResponse())
 }
 
 func (server *Server) getAccount(ctx *gin.Context) {

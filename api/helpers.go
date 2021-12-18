@@ -7,3 +7,9 @@ func ErrorResponse(err error) map[string]interface{} {
 		"error": err.Error(),
 	}
 }
+
+func SuccessResponse() map[string]interface{} {
+	return gin.H{
+		"message": "ok",
+	}
+}
