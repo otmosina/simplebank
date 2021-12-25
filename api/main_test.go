@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http/httptest"
 	"os"
 	"testing"
 
@@ -9,6 +10,13 @@ import (
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/otmosina/simplebank/db/mock"
 )
+
+type testCase struct {
+	name          string
+	accountID     int64
+	buildStubs    func(store *mockdb.MockStore)
+	checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+}
 
 func TestMain(m *testing.M) {
 	fmt.Println("MAIN_TEST API API API API API API API API API API API API API API API API ")

@@ -20,12 +20,7 @@ import (
 func TestGetAccountAPI(t *testing.T) {
 	account := randomAccount()
 
-	testCases := []struct {
-		name          string
-		accountID     int64
-		buildStubs    func(store *mockdb.MockStore)
-		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
-	}{
+	testCases := []testCase{
 		{
 			name:      "OK",
 			accountID: account.ID,
