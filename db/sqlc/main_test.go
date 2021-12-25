@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -20,6 +21,7 @@ var testQueries *Queries
 var testDB *sql.DB
 
 func TestMain(m *testing.M) {
+	fmt.Println("MAIN_TEST SQLC SQLC SQLC SQLC SQLC SQLC SQLC SQLC SQLC SQLC SQLC SQLC SQLC SQLC SQLC ")
 	var err error
 
 	config, err := util.LoadConfig("../..")

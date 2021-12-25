@@ -79,10 +79,7 @@ func TestGetAccountAPI(t *testing.T) {
 	for i := range testCases {
 		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
-
-			store := mockdb.NewMockStore(ctrl)
+			store := getMockStore(t)
 			tc.buildStubs(store)
 
 			server := NewServer(store)
