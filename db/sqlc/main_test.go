@@ -10,10 +10,10 @@ import (
 	"github.com/otmosina/simplebank/util"
 )
 
-const (
-	dbDriver = "postgres"
-	dbSource = "postgres://root:secret@localhost:5432/simple_bank?sslmode=disable"
-)
+// const (
+// 	dbDriver = "postgres"
+// 	dbSource = "postgres://root:secret@localhost:5432/simple_bank?sslmode=disable"
+// )
 
 var testQueries *Queries
 

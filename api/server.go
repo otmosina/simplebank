@@ -9,7 +9,7 @@ import (
 )
 
 type Server struct {
-	store  *db.Store
+	store  db.Store
 	router *gin.Engine
 }
 
@@ -29,7 +29,7 @@ type GetAccountRequest struct {
 
 type DeleteAccountRequest GetAccountRequest
 
-func NewServer(db *db.Store) *Server {
+func NewServer(db db.Store) *Server {
 	server := &Server{store: db}
 	router := gin.Default()
 
@@ -42,7 +42,7 @@ func NewServer(db *db.Store) *Server {
 	// })
 
 	router.GET("/accounts", server.indexAccounts)
-	router.GET("/accounts/:id", server.getAccount)
+	router.GET("/account/:id", server.getAccount)
 	router.POST("/accounts/:id", server.deleteAccount)
 	router.POST("/accounts", server.createAccounts)
 	// TODO add some routes
@@ -95,6 +95,7 @@ func (server *Server) getAccount(ctx *gin.Context) {
 		return
 	}
 
+	// account := db.Account{}
 	ctx.JSON(http.StatusOK, account)
 }
 
