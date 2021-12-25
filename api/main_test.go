@@ -10,10 +10,6 @@ import (
 	mockdb "github.com/otmosina/simplebank/db/mock"
 )
 
-// var ctrl *gomock.Controller
-
-// var mockstore *mockdb.MockStore
-
 func TestMain(m *testing.M) {
 	fmt.Println("MAIN_TEST API API API API API API API API API API API API API API API API ")
 	gin.SetMode(gin.TestMode)
