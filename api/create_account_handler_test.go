@@ -2,7 +2,9 @@ package api
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -41,19 +43,34 @@ func TestCreateAccoutAPI(t *testing.T) {
 			},
 		},
 
-		// {
-		// 	name:      "BadRequest",
-		// 	accountID: 0,
-		// 	buildStubs: func(store *mockdb.MockStore) {
-		// 		store.EXPECT().GetAccount(gomock.Any(), gomock.Any()).
-		// 			Times(0)
-		// 		store.EXPECT().DeleteAccount(gomock.Any(), gomock.Any()).
-		// 			Times(0)
-		// 	},
-		// 	checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-		// 		require.Equal(t, http.StatusBadRequest, recorder.Code)
-		// 	},
-		// },
+		{
+			name:    "BadRequest",
+			request: CreateAccountsRequest{},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:    "StatusInternalServerError2",
+			request: request,
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().CreateAccount(gomock.Any(), gomock.Eq(db.CreateAccountParams{
+					Owner:    request.Owner,
+					Currency: request.Currency,
+					Balance:  0,
+				})).
+					Times(1).
+					Return(db.Account{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+
 		// {
 		// 	name:      "GetAccountError",
 		// 	accountID: account.ID,
@@ -68,24 +85,10 @@ func TestCreateAccoutAPI(t *testing.T) {
 		// 		require.Equal(t, http.StatusNotFound, recorder.Code)
 		// 	},
 		// },
-		// {
-		// 	name:      "DeleteAccountError",
-		// 	accountID: account.ID,
-		// 	buildStubs: func(store *mockdb.MockStore) {
-		// 		store.EXPECT().GetAccount(gomock.Any(), gomock.Any()).
-		// 			Times(1).
-		// 			Return(account, nil)
-		// 		store.EXPECT().DeleteAccount(gomock.Any(), gomock.Any()).
-		// 			Times(1).
-		// 			Return(sql.ErrConnDone)
-		// 	},
-		// 	checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-		// 		require.Equal(t, http.StatusInternalServerError, recorder.Code)
-		// 	},
-		// },
+
 	}
 
-	var url string
+	// var url string
 	for i := range testCases {
 		tc := testCases[i]
 		t.Run(tc.name, func(t *testing.T) {
@@ -94,7 +97,8 @@ func TestCreateAccoutAPI(t *testing.T) {
 
 			server := NewServer(store)
 			recorder := httptest.NewRecorder()
-			url = "/accounts"
+			// url = "/accounts"
+			url := fmt.Sprintf("/accounts")
 			bytesRequest, _ := json.Marshal(tc.request)
 			reader := bytes.NewReader(bytesRequest)
 			// reader := strings.NewReader(bytesRequest)
