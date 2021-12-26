@@ -12,11 +12,6 @@ type Server struct {
 	router *gin.Engine
 }
 
-type CreateAccountsRequest struct {
-	Owner    string `json:"owner" binding:"required"`
-	Currency string `json:"currency" binding:"required,oneof=USD RUB IDR"`
-}
-
 type IndexAccountsRequest struct {
 	PageId   int32 `form:"page_id" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=5"`
@@ -58,29 +53,4 @@ func (server *Server) indexAccounts(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, accounts)
-}
-
-func (server *Server) createAccounts(ctx *gin.Context) {
-	// var err error
-	// var account db.Account
-	var req CreateAccountsRequest
-
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, ErrorResponse(err))
-		return
-	}
-
-	account, err := server.store.CreateAccount(ctx, db.CreateAccountParams{
-		Owner:    req.Owner,
-		Currency: req.Currency,
-		Balance:  0,
-	})
-
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
-		return
-	}
-	ctx.JSON(http.StatusOK, account)
 }

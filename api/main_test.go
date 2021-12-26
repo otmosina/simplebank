@@ -18,6 +18,13 @@ type testCase struct {
 	checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 }
 
+type testCaseCreate struct {
+	name          string
+	request       CreateAccountsRequest
+	buildStubs    func(store *mockdb.MockStore)
+	checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+}
+
 func TestMain(m *testing.M) {
 	fmt.Println("MAIN_TEST API API API API API API API API API API API API API API API API ")
 	gin.SetMode(gin.TestMode)
