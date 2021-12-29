@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -66,6 +67,26 @@ func TestIndexAccountAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:     "Internal Server Error",
+			pageID:   1,
+			pageSize: 5,
+			request: db.ListAccountsParams{
+				Limit:  pageSize,
+				Offset: (pageID - 1) * pageSize,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().ListAccounts(gomock.Any(), db.ListAccountsParams{
+					Limit:  limit,
+					Offset: offset,
+				}).
+					Times(1).
+					Return([]db.Account{{}}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
 	}

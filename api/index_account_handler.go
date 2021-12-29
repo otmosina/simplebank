@@ -25,7 +25,7 @@ func (server *Server) indexAccounts(ctx *gin.Context) {
 		Offset: (req.PageId - 1) * req.PageSize,
 	})
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, ErrorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, ErrorResponse(err))
 		return
 	}
 	ctx.JSON(http.StatusOK, accounts)
