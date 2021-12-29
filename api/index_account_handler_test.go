@@ -30,10 +30,12 @@ func TestIndexAccountAPI(t *testing.T) {
 
 	testCases := []testCaseIndex{
 		{
-			name: "OK",
+			name:     "OK",
+			pageID:   1,
+			pageSize: 5,
 			request: db.ListAccountsParams{
-				Limit:  limit,
-				Offset: offset,
+				Limit:  pageSize,
+				Offset: (pageID - 1) * pageSize,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().ListAccounts(gomock.Any(), db.ListAccountsParams{
@@ -45,6 +47,25 @@ func TestIndexAccountAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name:     "BadRequest",
+			pageID:   0,
+			pageSize: 5,
+			request: db.ListAccountsParams{
+				Limit:  pageSize,
+				Offset: (pageID - 1) * pageSize,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().ListAccounts(gomock.Any(), db.ListAccountsParams{
+					Limit:  limit,
+					Offset: offset,
+				}).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
 	}
@@ -61,7 +82,7 @@ func TestIndexAccountAPI(t *testing.T) {
 
 			server := NewServer(store)
 			recorder := httptest.NewRecorder()
-			url := fmt.Sprintf("/accounts?page_id=%d&page_size=%d", 1, 5)
+			url := fmt.Sprintf("/accounts?page_id=%d&page_size=%d", tc.pageID, tc.pageSize)
 			req, _ := http.NewRequest(http.MethodGet, url, nil)
 			server.router.ServeHTTP(recorder, req)
 

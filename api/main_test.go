@@ -34,6 +34,8 @@ type testCaseCreate struct {
 
 type testCaseIndex struct {
 	name          string
+	pageID        int32
+	pageSize      int32
 	request       db.ListAccountsParams
 	buildStubs    func(store *mockdb.MockStore)
 	checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
