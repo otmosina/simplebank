@@ -9,7 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/otmosina/simplebank/db/mock"
+	db "github.com/otmosina/simplebank/db/sqlc"
 )
+
+// testCaseBase {
+// 	name          string
+// 	buildStubs    func(store *mockdb.MockStore)
+// 	checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+// }
 
 type testCase struct {
 	name          string
@@ -21,6 +28,13 @@ type testCase struct {
 type testCaseCreate struct {
 	name          string
 	request       CreateAccountsRequest
+	buildStubs    func(store *mockdb.MockStore)
+	checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+}
+
+type testCaseIndex struct {
+	name          string
+	request       db.ListAccountsParams
 	buildStubs    func(store *mockdb.MockStore)
 	checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 }

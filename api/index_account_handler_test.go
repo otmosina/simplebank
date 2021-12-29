@@ -19,35 +19,56 @@ func TestIndexAccountAPI(t *testing.T) {
 	var accounts []db.Account
 	accounts = append(accounts, account1)
 	accounts = append(accounts, account2)
-	var a int64
-	a = 1
-	require.NotEmpty(t, a)
 
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+	var limit, offset, pageID, pageSize int32 // = 5
+	//var  offset int32// = 0
 
-	var limit int32 = 5
-	var offset int32 = 0
+	pageID = 1
+	pageSize = 5
+	limit = pageSize
+	offset = (pageID - 1) * pageSize
 
-	store := mockdb.NewMockStore(ctrl)
+	testCases := []testCaseIndex{
+		{
+			name: "OK",
+			request: db.ListAccountsParams{
+				Limit:  limit,
+				Offset: offset,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().ListAccounts(gomock.Any(), db.ListAccountsParams{
+					Limit:  limit,
+					Offset: offset,
+				}).
+					Times(1).
+					Return(accounts, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+	}
 
-	store.EXPECT().ListAccounts(gomock.Any(), db.ListAccountsParams{
-		Limit:  limit,
-		Offset: offset,
-	}).
-		Times(1).
-		Return(accounts, nil)
+	for i := range testCases {
+		tc := testCases[i]
+		t.Run(tc.name, func(t *testing.T) {
 
-	server := NewServer(store)
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			store := mockdb.NewMockStore(ctrl)
 
-	recorder := httptest.NewRecorder()
-	url := fmt.Sprintf("/accounts?page_id=%d&page_size=%d", 1, 5)
-	fmt.Println("==============================WE ARE LOOKING FOR THE NEXT URL==============================")
-	fmt.Println(url)
+			tc.buildStubs(store)
 
-	req, _ := http.NewRequest(http.MethodGet, url, nil)
+			server := NewServer(store)
+			recorder := httptest.NewRecorder()
+			url := fmt.Sprintf("/accounts?page_id=%d&page_size=%d", 1, 5)
+			req, _ := http.NewRequest(http.MethodGet, url, nil)
+			server.router.ServeHTTP(recorder, req)
 
-	server.router.ServeHTTP(recorder, req)
+			tc.checkResponse(t, recorder)
+		})
+	}
+
 	// fmt.Println(err.Error())
-	require.Equal(t, http.StatusOK, recorder.Code)
+	// require.Equal(t, http.StatusOK, recorder.Code)
 }
