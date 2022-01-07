@@ -28,6 +28,9 @@ gotidy:
 
 test:
 	go test -v -cover  ./...
+
+rtest:
+	richgo test ./...
 # gotest:
 # 	/usr/local/go/bin/go test  -timeout 30s -run ^main_test.go$
 

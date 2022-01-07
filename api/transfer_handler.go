@@ -21,6 +21,7 @@ func (s *Server) TransferRequest(ctx *gin.Context) {
 
 	var req TransferParamsRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
+		fmt.Println(err.Error())
 		ctx.JSON(http.StatusBadRequest, ErrorResponse(err))
 		return
 	}

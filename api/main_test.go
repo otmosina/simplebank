@@ -32,6 +32,13 @@ type testCaseCreate struct {
 	checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 }
 
+type testCaseTransfer struct {
+	name          string
+	request       TransferParamsRequest
+	buildStubs    func(store *mockdb.MockStore)
+	checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+}
+
 type testCaseIndex struct {
 	name          string
 	pageID        int32
