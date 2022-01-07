@@ -9,7 +9,7 @@ import (
 	db "github.com/otmosina/simplebank/db/sqlc"
 )
 
-type transferRequest struct {
+type TransferParamsRequest struct {
 	FromAccountID int64  `json:"from_account_id" binding:"required,min=1"`
 	ToAccountID   int64  `json:"to_account_id" binding:"required,min=1"`
 	Amount        int64  `json:"amount" binding:"required,gt=0"`
@@ -19,7 +19,7 @@ type transferRequest struct {
 
 func (s *Server) TransferRequest(ctx *gin.Context) {
 
-	var req transferRequest
+	var req TransferParamsRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, ErrorResponse(err))
 		return

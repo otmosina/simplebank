@@ -16,12 +16,12 @@ import (
 func TestTransferRequestAPI(t *testing.T) {
 	//
 
-	type transferRequest struct {
-		FromAccountID int64  `json:"from_account_id" binding:"required,min=1"`
-		ToAccountID   int64  `json:"to_account_id" binding:"required,min=1"`
-		Amount        int64  `json:"amount" binding:"required,gt=0"`
-		Currency      string `json:"currency" binding:"required,oneof=USD,RUB,IDR"`
-	}
+	// type transferRequest struct {
+	// 	FromAccountID int64  `json:"from_account_id" binding:"required,min=1"`
+	// 	ToAccountID   int64  `json:"to_account_id" binding:"required,min=1"`
+	// 	Amount        int64  `json:"amount" binding:"required,gt=0"`
+	// 	Currency      string `json:"currency" binding:"required,oneof=USD,RUB,IDR"`
+	// }
 
 	currency := util.RandomCurrency()
 
@@ -49,7 +49,7 @@ func TestTransferRequestAPI(t *testing.T) {
 		Times(1).
 		Return(account2, nil)
 
-	postRequest := transferRequest{
+	postRequest := TransferParamsRequest{
 		FromAccountID: account1.ID,
 		ToAccountID:   account2.ID,
 		Amount:        amount,
@@ -61,6 +61,11 @@ func TestTransferRequestAPI(t *testing.T) {
 		ToAccountID:   postRequest.ToAccountID,
 		Amount:        postRequest.Amount,
 	}
+
+	// testCases := []testCaseTransfer{{
+	// 	name:    "OK",
+	// 	request: postRequest,
+	// }}
 
 	store.EXPECT().TransferTx(gomock.Any(), transferParams).
 		Times(1)
