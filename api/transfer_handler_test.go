@@ -35,7 +35,7 @@ func TestTransferRequestAPI(t *testing.T) {
 	if minBalance > account2.Balance {
 		minBalance = account2.Balance
 	}
-	amount := util.RandomInt(0, minBalance)
+	amount := util.RandomInt(1, minBalance)
 
 	store := getMockStore(t)
 
@@ -49,12 +49,6 @@ func TestTransferRequestAPI(t *testing.T) {
 		Times(1).
 		Return(account2, nil)
 
-	transferParams := db.TransferTxParams{
-		FromAccountID: account1.ID,
-		ToAccountID:   account2.ID,
-		Amount:        amount,
-	}
-
 	postRequest := transferRequest{
 		FromAccountID: account1.ID,
 		ToAccountID:   account2.ID,
@@ -62,18 +56,25 @@ func TestTransferRequestAPI(t *testing.T) {
 		Currency:      "USD",
 	}
 
+	transferParams := db.TransferTxParams{
+		FromAccountID: postRequest.FromAccountID,
+		ToAccountID:   postRequest.ToAccountID,
+		Amount:        postRequest.Amount,
+	}
+
 	store.EXPECT().TransferTx(gomock.Any(), transferParams).
 		Times(1)
 
 	server := NewServer(store)
 	recorder := httptest.NewRecorder()
-	var url = "/transfers"
+	var url string = "/transfers"
+
 	// url := fmt.Sprintf("/transfers")
+
 	bytesRequest, _ := json.Marshal(postRequest)
 	reader := bytes.NewReader(bytesRequest)
 	request, err := http.NewRequest(http.MethodPost, url, reader)
 	require.NoError(t, err)
 	server.router.ServeHTTP(recorder, request)
 	require.Equal(t, http.StatusOK, recorder.Code)
-
 }
