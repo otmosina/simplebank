@@ -74,6 +74,30 @@ func TestTransferRequestAPI(t *testing.T) {
 				require.Equal(t, http.StatusOK, recorder.Code)
 			},
 		},
+		{
+			name: "Wrong currency",
+			request: TransferParamsRequest{
+				FromAccountID: account1.ID,
+				ToAccountID:   account2.ID,
+				Amount:        amount,
+				Currency:      "WRONG",
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetAccount(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				store.EXPECT().
+					GetAccount(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				store.EXPECT().TransferTx(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
 	}
 
 	// var url string = "/transfers"
