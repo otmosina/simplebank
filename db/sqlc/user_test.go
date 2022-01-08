@@ -29,6 +29,7 @@ func CreateRandomUser(t *testing.T) User {
 	require.Equal(t, arg.Email, user.Email, "they should be eq")
 
 	require.NotZero(t, user.CreatedAt)
+	require.True(t, user.PasswordChangedAt.IsZero())
 	// require.NotZero(t, user.PasswordChangedAt)
 	// assert.Equal(t, user.ID, int64(2), "they should be eq")
 	return user
