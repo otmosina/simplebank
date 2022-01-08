@@ -141,6 +141,28 @@ func TestTransferRequestAPI(t *testing.T) {
 			},
 		},
 		{
+			name:    "TransferTx Internal err",
+			request: postRequest,
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetAccount(gomock.Any(), account1.ID).
+					Times(1).
+					Return(account1, nil)
+
+				store.EXPECT().
+					GetAccount(gomock.Any(), account2.ID).
+					Times(1).
+					Return(account2, nil)
+
+				store.EXPECT().TransferTx(gomock.Any(), transferParams).
+					Times(1).
+					Return(db.TransferTxResult{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
 			name:    "Mismatch currency in first account",
 			request: postRequest,
 			buildStubs: func(store *mockdb.MockStore) {
@@ -181,28 +203,6 @@ func TestTransferRequestAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
-			},
-		},
-		{
-			name:    "TransferTx Internal err",
-			request: postRequest,
-			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().
-					GetAccount(gomock.Any(), account1.ID).
-					Times(1).
-					Return(account1, nil)
-
-				store.EXPECT().
-					GetAccount(gomock.Any(), account2.ID).
-					Times(1).
-					Return(account2, nil)
-
-				store.EXPECT().TransferTx(gomock.Any(), transferParams).
-					Times(1).
-					Return(db.TransferTxResult{}, sql.ErrConnDone)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
 	}
