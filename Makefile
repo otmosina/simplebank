@@ -14,8 +14,16 @@ postgres-start:
 migrateup:
 	migrate -path db/migrations -database "postgres://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up
 
+migrateup1:
+	migrate -path db/migrations -database "postgres://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose up 1
+
+
 migratedown:
 	migrate -path db/migrations -database "postgres://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down
+
+migratedown1:
+	migrate -path db/migrations -database "postgres://root:secret@localhost:5432/simple_bank?sslmode=disable" -verbose down 1
+
 
 sqlc:
 	sqlc generate
@@ -43,6 +51,8 @@ server:
 mock:
 	mockgen -package mockdb -destination db/mock/store.go --build_flags=--mod=mod github.com/otmosina/simplebank/db/sqlc Store
 
+createmigration:
+	migrate create -ext sql -dir db/migrations -seq add_users
 
 
 .PHONY: postgres createdb dropdb migrateup migratedown
