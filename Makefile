@@ -35,10 +35,10 @@ gotidy:
 	go mod tidy
 
 test:
-	go test -v -cover  ./...
-
-rtest:
 	richgo test -cover ./...
+
+test-simple:
+	go test -v -cover  ./...
 # gotest:
 # 	/usr/local/go/bin/go test  -timeout 30s -run ^main_test.go$
 
