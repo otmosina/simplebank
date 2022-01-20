@@ -4,10 +4,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func TestHashPassword(t *testing.T) {
-	password := "NewPassword"
+	password := RandomString(8)
 	hashed, err := HashPassword(password)
 	require.NoError(t, err)
 	require.NotEmpty(t, hashed)
@@ -15,8 +16,9 @@ func TestHashPassword(t *testing.T) {
 	err = CheckPassword(password, hashed)
 	require.NoError(t, err)
 
-	passwordNew := "NewPassword2"
-	err = CheckPassword(passwordNew, hashed)
+	wrongPassword := RandomString(8)
+	err = CheckPassword(wrongPassword, hashed)
 	require.Error(t, err)
+	require.EqualError(t, err, bcrypt.ErrMismatchedHashAndPassword.Error())
 
 }
