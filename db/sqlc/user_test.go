@@ -10,9 +10,10 @@ import (
 )
 
 func CreateRandomUser(t *testing.T) User {
+	password, _ := util.HashPassword(util.RandomString(8))
 	arg := CreateUserParams{
 		Username:       util.RandomOwner(),
-		HashedPassword: "secret",
+		HashedPassword: password,
 		Fullname:       util.RandomOwner(),
 		Email:          util.RandomEmail(),
 	}
