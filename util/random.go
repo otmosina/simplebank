@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"strings"
 	"time"
+
+	"github.com/jaswdr/faker"
 )
 
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -44,4 +46,9 @@ func RandomCurrency() string {
 	currencies := []string{"USD", "RUB", "CAD"}
 	k := len(currencies)
 	return currencies[rand.Intn(k)]
+}
+
+func RandomName() string {
+	faker := faker.New()
+	return faker.Person().Name()
 }

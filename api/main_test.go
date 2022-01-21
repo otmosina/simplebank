@@ -32,6 +32,12 @@ type testCaseCreate struct {
 	checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 }
 
+type testCaseUserCreate struct {
+	name          string
+	request       CreateUsersRequest
+	buildStubs    func(store *mockdb.MockStore)
+	checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+}
 type testCaseTransfer struct {
 	name          string
 	request       TransferParamsRequest
