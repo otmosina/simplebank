@@ -48,7 +48,6 @@ func TestCreateUserAPI(t *testing.T) {
 		Email:    util.RandomEmail(),
 	}
 
-
 	badRequestBadEmailTemplate := CreateUsersRequest{
 		Username: util.RandomOwner(),
 		Password: util.RandomString(6),
