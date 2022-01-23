@@ -29,7 +29,6 @@ func (server *Server) createAccounts(ctx *gin.Context) {
 		Currency: req.Currency,
 		Balance:  0,
 	})
-
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			log.Println(pqErr.Code.Name())

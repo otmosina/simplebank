@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/lib/pq"
 	mockdb "github.com/otmosina/simplebank/db/mock"
 	db "github.com/otmosina/simplebank/db/sqlc"
 	"github.com/otmosina/simplebank/util"
@@ -86,20 +87,13 @@ func TestCreateUserAPI(t *testing.T) {
 			name:    "OK",
 			request: request,
 			buildStubs: func(store *mockdb.MockStore) {
-
-				// store.EXPECT().CreateUser(gomock.Any(), gomock.Eq(db.CreateUserParams{
-				// 	Username:       request.Username,
-				// 	HashedPassword: request.Password,
-				// 	Fullname:       request.Fullname,
-				// 	Email:          request.Email,
-				// })).
-				// store.EXPECT().CreateUser(gomock.Any(), gomock.Any()).
 				store.EXPECT().CreateUser(gomock.Any(), EqCreateUserParams(db.CreateUserParams{
 					Username:       request.Username,
 					HashedPassword: request.Password,
 					Fullname:       request.Fullname,
 					Email:          request.Email,
-				}, request.Password)).Times(1).
+				}, request.Password)).
+					Times(1).
 					Return(user, nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -137,6 +131,23 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:    "OK",
+			request: request,
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().CreateUser(gomock.Any(), EqCreateUserParams(db.CreateUserParams{
+					Username:       request.Username,
+					HashedPassword: request.Password,
+					Fullname:       request.Fullname,
+					Email:          request.Email,
+				}, request.Password)).
+					Times(1).
+					Return(db.User{}, pq.ErrSSLNotSupported)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
 
