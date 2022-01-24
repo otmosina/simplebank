@@ -134,7 +134,7 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 		},
 		{
-			name:    "OK",
+			name:    "InternalServerError",
 			request: request,
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().CreateUser(gomock.Any(), EqCreateUserParams(db.CreateUserParams{
@@ -150,34 +150,6 @@ func TestCreateUserAPI(t *testing.T) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
-
-		// {
-		// 	name:    "BadRequest",
-		// 	request: CreateAccountsRequest{},
-		// 	buildStubs: func(store *mockdb.MockStore) {
-		// 		store.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).
-		// 			Times(0)
-		// 	},
-		// 	checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-		// 		require.Equal(t, http.StatusBadRequest, recorder.Code)
-		// 	},
-		// },
-		// {
-		// 	name:    "StatusInternalServerError2",
-		// 	request: request,
-		// 	buildStubs: func(store *mockdb.MockStore) {
-		// 		store.EXPECT().CreateAccount(gomock.Any(), gomock.Eq(db.CreateAccountParams{
-		// 			Owner:    request.Owner,
-		// 			Currency: request.Currency,
-		// 			Balance:  0,
-		// 		})).
-		// 			Times(1).
-		// 			Return(db.Account{}, sql.ErrConnDone)
-		// 	},
-		// 	checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-		// 		require.Equal(t, http.StatusInternalServerError, recorder.Code)
-		// 	},
-		// },
 	}
 
 	// var url string
